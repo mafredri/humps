@@ -11,7 +11,7 @@
 ;(function(global) {
 
   var _processKeys = function(convert, obj, options) {
-    if(!_isObject(obj) || _isDate(obj) || _isRegExp(obj) || _isBoolean(obj)) {
+    if(!_isObject(obj) || _isDate(obj) || _isRegExp(obj) || _isBoolean(obj) || _isMoment(obj)) {
       return obj;
     }
 
@@ -86,6 +86,9 @@
   };
   var _isBoolean = function(obj) {
     return toString.call(obj) == '[object Boolean]';
+  };
+  var _isMoment = function(obj) {
+    return obj._isAMomentObject;
   };
 
   // Performant way to determine if obj coerces to a number
