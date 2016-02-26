@@ -1,17 +1,18 @@
 // =========
 // = humps =
 // =========
+// version 0.6.0
 // Underscore-to-camelCase converter (and vice versa)
 // for strings and object keys
 
-// humps is copyright © 2012+ Dom Christie
+// humps is copyright © 2014 Dom Christie
 // Released under the MIT license.
 
 
 ;(function(global) {
 
-  var _processKeys = function(convert, obj, options) {
-    if(!_isObject(obj) || _isDate(obj) || _isRegExp(obj) || _isBoolean(obj) || _isMoment(obj)) {
+  var _processKeys = function(convert, obj, separator) {
+    if(!_isObject(obj) || _isDate(obj) || _isRegExp(obj) || _isMoment(obj)) {
       return obj;
     }
 
@@ -22,14 +23,14 @@
     if(_isArray(obj)) {
       output = [];
       for(l=obj.length; i<l; i++) {
-        output.push(_processKeys(convert, obj[i], options));
+        output.push(_processKeys(convert, obj[i], separator));
       }
     }
     else {
       output = {};
       for(var key in obj) {
         if(obj.hasOwnProperty(key)) {
-          output[convert(key, options)] = _processKeys(convert, obj[key], options);
+          output[convert(key, separator)] = _processKeys(convert, obj[key], separator);
         }
       }
     }
@@ -38,12 +39,11 @@
 
   // String conversion methods
 
-  var separateWords = function(string, options) {
-    options = options || {};
-    var separator = options.separator || '_';
-    var split = options.split || /(?=[A-Z])/;
-
-    return string.split(split).join(separator);
+  var separateWords = function(string, separator) {
+    if (typeof separator === 'undefined') {
+      separator = '_';
+    }
+    return string.replace(/([a-z])([A-Z0-9])/g, '$1'+ separator +'$2');
   };
 
   var camelize = function(string) {
@@ -63,8 +63,8 @@
     return camelized.substr(0, 1).toUpperCase() + camelized.substr(1);
   };
 
-  var decamelize = function(string, options) {
-    return separateWords(string, options).toLowerCase();
+  var decamelize = function(string, separator) {
+    return separateWords(string, separator).toLowerCase();
   };
 
   // Utilities
@@ -84,9 +84,6 @@
   var _isRegExp = function(obj) {
     return toString.call(obj) == '[object RegExp]';
   };
-  var _isBoolean = function(obj) {
-    return toString.call(obj) == '[object Boolean]';
-  };
   var _isMoment = function(obj) {
     return obj._isAMomentObject;
   };
@@ -105,8 +102,8 @@
     camelizeKeys: function(object) {
       return _processKeys(camelize, object);
     },
-    decamelizeKeys: function(object, options) {
-      return _processKeys(decamelize, object, options);
+    decamelizeKeys: function(object, separator) {
+      return _processKeys(decamelize, object, separator);
     },
     pascalizeKeys: function(object) {
       return _processKeys(pascalize, object);
